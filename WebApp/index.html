@@ -1,0 +1,246 @@
+<!doctype html>
+<html>
+    <head>
+    	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+        <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular-animate.js"></script>
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="fbsstyle.css">
+
+        <title>FB Search</title>
+    </head>
+    <body ng-app="fbs" ng-controller="SearchController">
+    	<script>
+		  	window.fbAsyncInit = function() {
+		    	FB.init({
+		      		appId      : '169684620204533',
+		      		xfbml      : true,
+		      		version    : 'v2.8'
+		    	});
+		    	FB.AppEvents.logPageView();
+		  	};
+
+		  	(function(d, s, id){
+		     	var js, fjs = d.getElementsByTagName(s)[0];
+		     	if (d.getElementById(id)) {return;}
+		     	js = d.createElement(s); js.id = id;
+		     	js.src = "//connect.facebook.net/en_US/sdk.js";
+		     	fjs.parentNode.insertBefore(js, fjs);
+		   	 }(document, 'script', 'facebook-jssdk'));
+		</script>
+        <header class="navbar" id="header">
+            <div class="container">
+                <div class="navbar-header">
+                    <div class="navbar-brand">FB Search</div>
+                </div>
+                <div class="navbar-nav">
+                    <form ng-submit="submit()" class="navbar-form" id="searchForm">
+                        <div id="inputDiv" class="col-xs-9 col-sm-5 col-md-5 col-lg-5">
+	                        <div class="input-group">
+	                            <input ng-focus="inputFocus()" type="text" name="keyword" id="keyword" class="form-control" placeholder="type something..." data-toggle="tooltip" title="Please type a keyword" data-placement="bottom">
+	                            <span class="input-group-btn" id="submitButton">
+	                                <button class="btn form-btn" type="submit">
+	                                    <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+	                                </button>
+	                            </span>
+	                        </div>
+                        </div>
+                        <input ng-model="type" type="hidden" name="type" id="type" value="user">
+                        <div>
+                        	<button ng-click="clear()" type="reset" class="btn form-btn" id="clearButton">Clear</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </header>
+        <nav>
+	        <ul class="nav nav-tabs nav-justified" id="navBar">
+			  	<li class="active"><a ng-click="changeTab('user')" id="user">Users</a></li>
+			  	<li><a ng-click="changeTab('page')" id="page">Pages</a></li>
+			  	<li><a ng-click="changeTab('event')" id="event">Events</a></li>
+			  	<li><a ng-click="changeTab('place')" id="place">Places</a></li>
+			  	<li><a ng-click="changeTab('group')" id="group">Groups</a></li>
+			  	<li><a ng-click="changeTab('favorite')" id="favorite">Favorite</a></li>
+			</ul>
+		</nav>
+
+		<div ng-show="!isDetailShown" id="resultDiv" class="animate-show-hide container-fluid">
+			<div ng-if="!isFavoriteShown">
+				<div ng-if="!isLoaded" class="progress">
+				  	<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width: 50%">
+				    	<span class="sr-only">50% Complete</span>
+				  	</div>
+				</div>
+				<div ng-if="noDataFound" class="alert alert-warning" role="alert">No data found.</div>
+				<div ng-if="data&&data.length>0" class="table-responsive">
+					<table class="table table-hover" id="resultTable">
+						<thead>
+							<tr>
+								<th>#</th>
+								<th>Profile photo</th>
+								<th>Name</th>
+								<th>Favorite</th>
+								<th>Details</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="row in data" id="{{row.id}}">
+								<th>{{$index + 1}}</th>
+								<td><img src="{{row.picture.data.url}}" class="img-circle" width="40px" height="40px;"></td>
+								<td>{{row.name}}</td>
+								<td>
+									<button ng-if="!storage[row.id]" ng-click="addFavorite($index)" type="button" class="starButton btn btn-default">
+									  	<span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
+									</button>
+									<button ng-if="storage[row.id]" ng-click="removeFavorite(row.id)" type="button" class="starButton btn btn-default">
+									  	<span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+									</button>
+								</td>
+								<td>
+									<button ng-click="showDetail(row.id)" type="button" class="btn btn-default">
+									  	<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+									</button>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+				<div class="col-md-12 text-center" id="paging">
+					<span ng-if="paging.previous">
+						<a ng-click="changePage(paging.previous)" class="btn btn-default" role="button">Previous</a>
+					</span>
+			      	<span ng-if="paging.next">
+						<a ng-click="changePage(paging.next)" class="btn btn-default" id="nextButton" role="button">Next</a>
+					</span>
+			    </div>
+		    </div>
+
+		    <div ng-if="isFavoriteShown">
+		    	<div ng-if="favoriteSize<=0" class="alert alert-warning" role="alert">No data found.</div>
+				<div ng-if="favoriteSize>0" class="table-responsive">
+					<table class="table table-hover" id="favoriteTable">
+						<thead>
+							<tr>
+								<th>#</th>
+								<th>Profile photo</th>
+								<th>Name</th>
+								<th>Type</th>
+								<th>Favorite</th>
+								<th>Details</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="(key, value) in storage" id="{{key}}">
+								<th>{{$index + 1}}</th>
+								<td><img src="{{value.url}}" class="img-circle" width="40px" height="40px;"></td>
+								<td>{{value.name}}</td>
+								<td>{{value.type}}</td>
+								<td>
+									<button ng-click="removeFavorite(key)" type="button" class="btn btn-default">
+									  	<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+									</button>
+								</td>
+								<td>
+									<button ng-click="showDetail(key)" type="button" class="btn btn-default">
+									  	<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+									</button>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+		    </div>
+		</div>
+
+	    <div ng-show="isDetailShown" class="animate-show-hide container-fluid" id="detailDiv">
+	    	<button ng-click="backToResult()" type="button" class="btn btn-default">
+			  	<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>Back
+			</button>
+			<div class="pull-right">
+		    	<button ng-if="!storage[detail.id]" ng-click="addFavoriteFromDetail()" type="button" class="starButton btn btn-default">
+				  	<span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
+				</button>
+				<button ng-if="storage[detail.id]" ng-click="removeFavorite(detail.id)" type="button" class="starButton btn btn-default">
+				  	<span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+				</button>
+				<button ng-click="post()" type="button" class="btn btn-default" id="fbButton">
+				  	<img src="facebook.png">
+				</button>
+			</div>
+			<div class="row" id="panelDiv">
+				<div class="col-md-6 col-xs-12">
+					<div class="panel panel-default">
+					  	<div class="panel-heading">Albums</div>
+					  	<div class="panel-body" id="albumsPanelBody">
+					  		<div ng-if="!isLoaded" class="progress">
+							  	<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width: 50%">
+							    	<span class="sr-only">50% Complete</span>
+							  	</div>
+							</div>
+					  		<div ng-if="noAlbumsDataFound" class="alert alert-warning" role="alert">No data found.</div>
+					    	<div ng-if="albums" class="panel-group" id="albumPanel">
+							  	<div ng-repeat="album in albums.data" class="panel panel-default">
+							  		<div ng-if="album.photos" class="panel-heading">
+							  			<a role="button" data-toggle="collapse" data-target="#photos{{$index}}" data-parent="#albumPanel">{{album.name}}</a>
+							  		</div>
+							  		<div ng-if="!album.photos" class="panel-heading">
+							  			{{album.name}}
+							  		</div>
+							    	<div ng-if="album.photos&&$index==0" class="panel-body collapse in" id="photos{{$index}}">
+						    			<img ng-repeat="photo in album.photos.data" class="albumPhoto img-rounded img-responsive" src="search.php?photoid={{photo.id}}">
+							    	</div>
+							    	<div ng-if="album.photos&&$index>0" class="panel-body collapse" id="photos{{$index}}">
+						    			<img ng-repeat="photo in album.photos.data" class="albumPhoto img-rounded img-responsive" src="search.php?photoid={{photo.id}}">
+							    	</div>
+							  	</div>
+							</div>
+					  	</div>
+					</div>
+				</div>
+				<div class="col-md-6 col-xs-12">
+					<div class="panel panel-default">
+					  	<div class="panel-heading">Posts</div>
+					  	<div class="panel-body" id="postsPanelBody">
+					  		<div ng-if="!isLoaded" class="progress">
+							  	<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width: 50%">
+							    	<span class="sr-only">50% Complete</span>
+							  	</div>
+							</div>
+					  		<div ng-if="noPostsDataFound" class="alert alert-warning" role="alert">No data found.</div>
+					    	<div ng-if="posts" class="panel-group" id="postPanel">
+							  	<div ng-repeat="post in posts.data" class="panel panel-default">
+							  		<div class="panel-heading">
+							    		<table>
+							    			<tr>
+							    				<td>
+							    					<img class="postHeadingImg" src="{{detail.picture.data.url}}" width="40px" height="40px">
+							    				</td>
+								    			<td>
+								    				<div class="postName">{{detail.name}}</div>
+								    				<div class="postTime">{{post.created_time | date:"yyyy-MM-dd HH:mm:ss"}}</div>
+								    			</td>
+							    			</tr>
+							    		</table>
+							    	</div>
+							    	<div ng-if="post.message" class="panel-body">
+							    		{{post.message}}
+							    	</div>
+							    	<div ng-if="!post.message" class="panel-body">
+							    		{{post.story}}
+							    	</div>
+							  	</div>
+							</div>
+					  	</div>
+					</div>
+				</div>
+			</div>
+	    </div>
+
+		<script src="fbsjs.js"></script>
+    </body>
+</html>

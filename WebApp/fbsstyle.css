@@ -1,0 +1,187 @@
+body {
+	-webkit-overflow-scrolling: touch;
+}
+
+.navbar {
+	border-radius: 0;
+}
+.form-control {
+	border-radius: 0;
+}
+
+.form-btn {
+	border-radius: 0;
+}
+
+#header .navbar-nav {
+	float: none;
+	text-align: center;
+	margin: 0;
+}
+
+#header .navbar-brand {
+	color: #3b5998;
+}
+
+#keyword {
+	border-right: none;
+}
+
+#submitButton {
+	background-color: #3b5998;
+}
+
+#submitButton button {
+	background-color: #3b5998;
+	color: white;
+}
+
+#clearButton {
+	background-color: white;
+	color: #3b5998;
+	border: 1px solid #3b5998;
+}
+
+.navbar-form > div {
+	display: inline-block;
+	vertical-align: middle;
+}
+
+#inputDiv {
+	float: none;
+}
+
+.input-group {
+	width: 100%;
+}
+
+#header {
+	background-color: #f7f7f7;
+	border-bottom: 1px solid #ddd;
+	margin-bottom: 0;
+}
+
+@media (max-width: 767px) {
+  	#searchForm {
+    	border-top: 1px solid #ddd;
+    	margin-top: 0;
+    	margin-bottom: 0;
+  	}
+}
+
+#navBar > .active > a {
+	border: none;
+	background-color: #3b5998;
+	color: white;
+}
+
+#navBar > li > a {
+	border-radius: 0;
+	border: none;
+	background-color: white;
+	color: black;
+	cursor: pointer;
+	margin-bottom: 0;
+}
+
+#navBar {
+	border-bottom: 2px solid #3b5998;
+}
+
+@media (max-width: 767px) {
+	#navBar {
+		border-bottom: 3px solid #3b5998;
+	}
+	#navBar > li > a {
+		padding-top: 0;
+		padding-bottom: 0;
+	}
+}
+
+#resultDiv, #detailDiv {
+	padding: 20px;
+}
+
+#resultTable th, #resultTable td {
+	vertical-align: middle;
+}
+
+.starButton > .glyphicon-star{
+	color: #FFD400;
+}
+
+#paging a {
+	padding-top: 8px;
+	padding-bottom: 8px;
+}
+
+#nextButton {
+	padding-left: 24.32px;
+	padding-right: 24.32px;
+	margin-left: 30px;
+}
+
+#fbButton {
+	height: 34px;
+	padding: 5px 10px;
+	vertical-align: middle;
+}
+
+#fbButton img {
+	height: 100%;
+}
+
+#panelDiv {
+	margin-top: 20px;
+}
+
+#detailDiv.animate-show-hide.ng-hide {
+  	transform: translateX(-100%);
+}
+
+#detailDiv.animate-show-hide.ng-hide-remove {
+	transition: 0.5s linear all;
+}
+
+#resultDiv.animate-show-hide.ng-hide {
+  	transform: translateX(100%);
+}
+
+#resultDiv.animate-show-hide.ng-hide-remove {
+	transition: 0.5s linear all;
+}
+
+#detailDiv, #resultDiv {
+	transform: translateX(0);
+}
+
+#albumPanel a {
+	color: black;
+}
+
+.albumPhoto {
+	margin-bottom: 15px;
+}
+
+#postPanel .panel-heading {
+	padding-bottom: 0;
+	background-color: white;
+}
+
+.postName {
+	font-weight: bold;
+}
+
+.postTime {
+	color: #8c8c8c;
+}
+
+#resultDiv .progress {
+	margin-top: 15%;
+	margin-left: 10%;
+	margin-right: 10%;
+}
+
+.postHeadingImg {
+	margin-right: 15px;
+}
